@@ -1,6 +1,7 @@
 package com.hoaxify.ws.user;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -11,11 +12,19 @@ import com.hoaxify.ws.shared.GenericMessage;
 public class UserController {
 
     @Autowired
-    UserService userService;
+    private final UserService userService;
+
+    public
+    UserController ( UserService userService ) {
+        this.userService = userService;
+    }
 
     @PostMapping("/api/v1/users")
-    GenericMessage createUser(@RequestBody User user) {
+    ResponseEntity<?> createUser(@RequestBody User user) {
+        if (user.getUsername() == null || user.getUsername().isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
         userService.save(user);
-        return new GenericMessage("User saved");
+        return ResponseEntity.ok(new GenericMessage("User is created"));
     }
 }
